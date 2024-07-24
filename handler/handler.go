@@ -1,0 +1,158 @@
+package handler
+
+import (
+    "github.com/df-mc/dragonfly/server/block/cube"
+    "github.com/df-mc/dragonfly/server/event"
+    "github.com/df-mc/dragonfly/server/item"
+    "github.com/df-mc/dragonfly/server/player"
+    "github.com/df-mc/dragonfly/server/world"
+    "github.com/go-gl/mathgl/mgl64"
+    "sync"
+)
+
+const (
+    BlockBreakHandlerID = iota
+    BlockPlaceHandlerID
+    AttackEntityHandlerID
+    DeathHandlerID
+    FoodLossHandlerID
+    HealHandlerID
+    ChatHandlerID
+    ChangeWorldHandlerID
+    TeleportHandlerID
+    MoveHandlerID
+)
+
+var (
+    handlers   = make(map[int][]interface{})
+    handlersMu sync.Mutex
+)
+
+type Handler struct {
+    p *player.Player
+
+    player.NopHandler
+}
+
+// Hook hooks the handler into the player p. This should be called when a player is created.
+func Hook(p *player.Player) {
+    p.Handle(&Handler{p: p})
+}
+
+// RegisterHandler registers a handler for a specific event ID. The handler will be called when the event
+func RegisterHandler(id int, handler interface{}) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    handlers[id] = append(handlers[id], handler)
+}
+
+// HandleBlockBreak handles a block that is being broken by a player. ctx.Cancel() may be called to cancel
+// the block being broken. A pointer to a slice of the block's drops is passed, and may be altered
+// to change what items will actually be dropped.
+func (h *Handler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack, xp *int) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[BlockBreakHandlerID] {
+        if handler.(BlockBreakHandler).BlockBreak(h.p, pos, drops, xp) {
+            ctx.Cancel()
+        }
+    }
+}
+
+// HandleBlockPlace handles the player placing a specific block at a position in its world. ctx.Cancel()
+// may be called to cancel the block being placed.
+func (h *Handler) HandleBlockPlace(ctx *event.Context, pos cube.Pos, b world.Block) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[BlockPlaceHandlerID] {
+        if handler.(BlockPlaceHandler).BlockPlace(h.p, pos, b) {
+            ctx.Cancel()
+        }
+    }
+}
+
+func (h *Handler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64, critical *bool) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[AttackEntityHandlerID] {
+        if handler.(AttackEntityHandler).HandleAttackEntity(h.p, ctx, e, force, height, critical) {
+            ctx.Cancel()
+        }
+    }
+}
+
+// HandleDeath handles the player dying to a particular damage cause.
+func (h *Handler) HandleDeath(src world.DamageSource, keepInv *bool) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[DeathHandlerID] {
+        handler.(DeathHandler).HandleDeath(src, keepInv)
+    }
+}
+
+// HandleFoodLoss handles the player losing food. ctx.Cancel() may be called to cancel the food loss.
+func (h *Handler) HandleFoodLoss(ctx *event.Context, from int, to *int) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[FoodLossHandlerID] {
+        handler.(FoodLossHandler).HandleFoodLoss(h.p, ctx, from, to)
+    }
+}
+
+// HandleHeal handles the player being healed by a healing source. ctx.Cancel() may be called to cancel
+// the healing.
+func (h *Handler) HandleHeal(ctx *event.Context, health *float64, src world.HealingSource) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[HealHandlerID] {
+        handler.(HealHandler).HandleHeal(h.p, ctx, health, src)
+    }
+}
+
+// HandleChat handles a player sending a chat message. ctx.Cancel() may be called to cancel the chat message.
+func (h *Handler) HandleChat(ctx *event.Context, message *string) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[ChatHandlerID] {
+        handler.(ChatHandler).HandleChat(h.p, ctx, message)
+    }
+}
+
+// HandleChangeWorld handles when the player is added to a new world. before may be nil.
+func (h *Handler) HandleChangeWorld(before, after *world.World) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[ChangeWorldHandlerID] {
+        handler.(ChangeWorldHandler).HandleChangeWorld(h.p, before, after)
+    }
+}
+
+// HandleTeleport handles the teleportation of a player. ctx.Cancel() may be called to cancel it.
+func (h *Handler) HandleTeleport(ctx *event.Context, pos mgl64.Vec3) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[TeleportHandlerID] {
+        handler.(TeleportHandler).HandleTeleport(h.p, ctx, pos)
+    }
+}
+
+// HandleMove handles the movement of a player. ctx.Cancel() may be called to cancel the movement event.
+// The new position, yaw and pitch are passed.
+func (h *Handler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newPitch float64) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[MoveHandlerID] {
+        handler.(MoveHandler).HandleMove(h.p, ctx, newPos, newYaw, newPitch)
+    }
+}
