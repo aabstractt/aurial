@@ -79,7 +79,7 @@ func (h *Handler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, 
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[AttackEntityHandlerID] {
-        if handler.(AttackEntityHandler).HandleAttackEntity(h.p, ctx, e, force, height, critical, ctx.Cancelled()) {
+        if handler.(AttackEntityHandler).HandleAttackEntity(h.p, e, force, height, critical, ctx.Cancelled()) {
             ctx.Cancel()
         }
     }
@@ -91,7 +91,7 @@ func (h *Handler) HandleDeath(src world.DamageSource, keepInv *bool) {
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[DeathHandlerID] {
-        handler.(DeathHandler).HandleDeath(src, keepInv)
+        handler.(DeathHandler).HandleDeath(h.p, src, keepInv)
     }
 }
 
