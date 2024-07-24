@@ -8,5 +8,6 @@ import (
 
 type BlockBreakHandler interface {
     // BlockBreak is called when a block is broken by a player. The position of the block that is being
-    BlockBreak(p *player.Player, pos cube.Pos, drops *[]item.Stack, xp *int) bool
+    // cancelled is true if the already was cancelled by another handler.
+    BlockBreak(p *player.Player, pos cube.Pos, drops *[]item.Stack, xp *int, cancelled bool) bool
 }

@@ -8,5 +8,6 @@ import (
 
 type BlockPlaceHandler interface {
     // BlockPlace is called when a block is placed by a player. The position of the block that is being
-    BlockPlace(p *player.Player, pos cube.Pos, b world.Block) bool
+    // cancelled is true if the already was cancelled by another handler.
+    BlockPlace(p *player.Player, pos cube.Pos, b world.Block, cancelled bool) bool
 }

@@ -55,7 +55,7 @@ func (h *Handler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]it
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[BlockBreakHandlerID] {
-        if handler.(BlockBreakHandler).BlockBreak(h.p, pos, drops, xp) {
+        if handler.(BlockBreakHandler).BlockBreak(h.p, pos, drops, xp, ctx.Cancelled()) {
             ctx.Cancel()
         }
     }
@@ -68,7 +68,7 @@ func (h *Handler) HandleBlockPlace(ctx *event.Context, pos cube.Pos, b world.Blo
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[BlockPlaceHandlerID] {
-        if handler.(BlockPlaceHandler).BlockPlace(h.p, pos, b) {
+        if handler.(BlockPlaceHandler).BlockPlace(h.p, pos, b, ctx.Cancelled()) {
             ctx.Cancel()
         }
     }
@@ -79,7 +79,7 @@ func (h *Handler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, 
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[AttackEntityHandlerID] {
-        if handler.(AttackEntityHandler).HandleAttackEntity(h.p, ctx, e, force, height, critical) {
+        if handler.(AttackEntityHandler).HandleAttackEntity(h.p, ctx, e, force, height, critical, ctx.Cancelled()) {
             ctx.Cancel()
         }
     }
@@ -101,7 +101,9 @@ func (h *Handler) HandleFoodLoss(ctx *event.Context, from int, to *int) {
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[FoodLossHandlerID] {
-        handler.(FoodLossHandler).HandleFoodLoss(h.p, ctx, from, to)
+        if handler.(FoodLossHandler).HandleFoodLoss(h.p, from, to, ctx.Cancelled()) {
+            ctx.Cancel()
+        }
     }
 }
 
@@ -112,7 +114,9 @@ func (h *Handler) HandleHeal(ctx *event.Context, health *float64, src world.Heal
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[HealHandlerID] {
-        handler.(HealHandler).HandleHeal(h.p, ctx, health, src)
+        if handler.(HealHandler).HandleHeal(h.p, health, src, ctx.Cancelled()) {
+            ctx.Cancel()
+        }
     }
 }
 
@@ -122,7 +126,9 @@ func (h *Handler) HandleChat(ctx *event.Context, message *string) {
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[ChatHandlerID] {
-        handler.(ChatHandler).HandleChat(h.p, ctx, message)
+        if handler.(ChatHandler).HandleChat(h.p, message, ctx.Cancelled()) {
+            ctx.Cancel()
+        }
     }
 }
 
@@ -142,7 +148,9 @@ func (h *Handler) HandleTeleport(ctx *event.Context, pos mgl64.Vec3) {
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[TeleportHandlerID] {
-        handler.(TeleportHandler).HandleTeleport(h.p, ctx, pos)
+        if handler.(TeleportHandler).HandleTeleport(h.p, pos, ctx.Cancelled()) {
+            ctx.Cancel()
+        }
     }
 }
 
@@ -153,6 +161,8 @@ func (h *Handler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newP
     defer handlersMu.Unlock()
 
     for _, handler := range handlers[MoveHandlerID] {
-        handler.(MoveHandler).HandleMove(h.p, ctx, newPos, newYaw, newPitch)
+        if handler.(MoveHandler).HandleMove(h.p, newPos, newYaw, newPitch, ctx.Cancelled()) {
+            ctx.Cancel()
+        }
     }
 }

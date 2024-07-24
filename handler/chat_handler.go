@@ -1,13 +1,12 @@
 package handler
 
 import (
-    "github.com/df-mc/dragonfly/server/event"
     "github.com/df-mc/dragonfly/server/player"
 )
 
 type ChatHandler interface {
-    // HandleChat handles a message sent in the chat by a player. ctx.Cancel() may be called to cancel the
-    // message being sent in chat.
-    // The message may be changed by assigning to *message.
-    HandleChat(p *player.Player, ctx *event.Context, message *string)
+    // HandleChat handles a message sent in the chat by a player.
+    // If the message should be cancelled, return true.
+    // cancelled is true if the already was cancelled by another handler.
+    HandleChat(p *player.Player, message *string, cancelled bool) bool
 }
