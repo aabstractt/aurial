@@ -8,12 +8,14 @@ import (
     "github.com/df-mc/dragonfly/server/world"
     "github.com/go-gl/mathgl/mgl64"
     "sync"
+    "time"
 )
 
 const (
     BlockBreakHandlerID = iota
     BlockPlaceHandlerID
     AttackEntityHandlerID
+    HurtHandlerID
     DeathHandlerID
     FoodLossHandlerID
     HealHandlerID
@@ -80,6 +82,19 @@ func (h *Handler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, 
 
     for _, handler := range handlers[AttackEntityHandlerID] {
         if handler.(AttackEntityHandler).HandleAttackEntity(h.p, e, force, height, critical, ctx.Cancelled()) {
+            ctx.Cancel()
+        }
+    }
+}
+
+// HandleHurt handles the player being hurt by a damage source. ctx.Cancel() may be called to cancel the
+// damage being dealt to the player. The damage dealt to the player may be changed by assigning to *damage.
+func (h *Handler) HandleHurt(ctx *event.Context, damage *float64, attackImmunity *time.Duration, src world.DamageSource) {
+    handlersMu.Lock()
+    defer handlersMu.Unlock()
+
+    for _, handler := range handlers[HurtHandlerID] {
+        if handler.(HurtHandler).HandleHurt(h.p, damage, attackImmunity, src, ctx.Cancelled()) {
             ctx.Cancel()
         }
     }
