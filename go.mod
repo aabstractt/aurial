@@ -1,4 +1,4 @@
-module aurial
+module github.com/aabstractt/aurial
 
 go 1.22
 
