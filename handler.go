@@ -23,6 +23,7 @@ var (
 	changeWorldRegistry  = newRegistry[ChangeWorldHandler]()
 	teleportRegistry     = newRegistry[TeleportHandler]()
 	moveRegistry         = newRegistry[MoveHandler]()
+	quitRegistry         = newRegistry[QuitHandler]()
 )
 
 type Handler struct {
@@ -193,5 +194,12 @@ func (h *Handler) HandleMove(ectx *event.Context, newPos mgl64.Vec3, newYaw, new
 
 	if ctx.Cancelled() {
 		ectx.Cancel()
+	}
+}
+
+// HandleQuit handles the player quitting the game.
+func (h *Handler) HandleQuit() {
+	for _, handler := range quitRegistry.all() {
+		handler.HandleQuit(h.p)
 	}
 }

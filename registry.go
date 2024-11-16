@@ -92,3 +92,7 @@ func TeleportRegistry() *Registry[TeleportHandler] {
 func MoveRegistry() *Registry[MoveHandler] {
 	return moveRegistry
 }
+
+func QuitRegistry() *Registry[QuitHandler] {
+	return quitRegistry
+}
