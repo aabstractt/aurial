@@ -46,6 +46,7 @@ func (r *Registry[V]) all() []V {
 func newRegistry[V any]() *Registry[V] {
 	return &Registry[V]{
 		values: make(map[int32]V),
+		number: new(atomic.Int32),
 	}
 }
 
