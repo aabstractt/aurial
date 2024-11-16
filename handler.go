@@ -2,7 +2,9 @@ package aurial
 
 import (
 	"github.com/aabstractt/aurial/context"
+	"github.com/df-mc/dragonfly/server"
 	"github.com/df-mc/dragonfly/server/block/cube"
+	"github.com/df-mc/dragonfly/server/entity"
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
@@ -27,14 +29,15 @@ var (
 )
 
 type Handler struct {
-	p *player.Player
+	srv *server.Server
+	p   *player.Player
 
 	player.NopHandler
 }
 
 // Apply applies the handler to a player. This should be called to apply the handler to a player.
-func Apply(p *player.Player) {
-	p.Handle(&Handler{p: p})
+func Apply(srv *server.Server, p *player.Player) {
+	p.Handle(&Handler{srv: srv, p: p})
 }
 
 // HandleBlockBreak handles a block that is being broken by a player. ctx.Cancel() may be called to cancel
@@ -105,12 +108,37 @@ func (h *Handler) HandleHurt(ectx *event.Context, damage *float64, attackImmunit
 // HandleDeath handles the player dying to a particular damage cause.
 func (h *Handler) HandleDeath(src world.DamageSource, keepInv *bool) {
 	ctx := context.NewDeathContext(src, *keepInv)
+	ctx.SetMessageCondition(func(p *player.Player) bool {
+		return true
+	})
+
+	if srcAttack, ok := src.(entity.AttackDamageSource); ok {
+		if attacker, ok := srcAttack.Attacker.(*player.Player); ok {
+			ctx.SetKiller(attacker)
+		}
+	}
 
 	for _, handler := range deathRegistry.all() {
 		handler.HandleDeath(h.p, ctx)
 	}
 
 	*keepInv = ctx.KeepInventory()
+
+	msg := ctx.Message()
+	if msg == "" {
+		return
+	}
+
+	msgCondition := ctx.MessageCondition()
+	if msgCondition == nil {
+		return
+	}
+
+	for _, t := range h.srv.Players() {
+		if msgCondition(t) {
+			t.Message(msg)
+		}
+	}
 }
 
 // HandleFoodLoss handles the player losing food. ctx.Cancel() may be called to cancel the food loss.
