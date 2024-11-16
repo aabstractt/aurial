@@ -1,6 +1,8 @@
 package context
 
 import (
+	"github.com/df-mc/dragonfly/server/entity"
+	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
 	"time"
 )
@@ -30,26 +32,44 @@ func NewHurtContext(damage float64, attackImmunity time.Duration, src world.Dama
 }
 
 // Damage returns the amount of damage that is dealt to the player.
-func (h *HurtContext) Damage() float64 {
-	return h.damage
+func (ctx *HurtContext) Damage() float64 {
+	return ctx.damage
 }
 
 // SetDamage sets the amount of damage that is dealt to the player.
-func (h *HurtContext) SetDamage(damage float64) {
-	h.damage = damage
+func (ctx *HurtContext) SetDamage(damage float64) {
+	ctx.damage = damage
 }
 
 // AttackImmunity returns the duration for which the player is immune to attacks.
-func (h *HurtContext) AttackImmunity() time.Duration {
-	return h.attackImmunity
+func (ctx *HurtContext) AttackImmunity() time.Duration {
+	return ctx.attackImmunity
 }
 
 // SetAttackImmunity sets the duration for which the player is immune to attacks.
-func (h *HurtContext) SetAttackImmunity(immunity time.Duration) {
-	h.attackImmunity = immunity
+func (ctx *HurtContext) SetAttackImmunity(immunity time.Duration) {
+	ctx.attackImmunity = immunity
+}
+
+// Attacker returns the attacker of the player, if the source of the damage is an attack damage source or a
+// projectile damage source. If the source is neither of these, nil is returned.
+func (ctx *HurtContext) Attacker() *player.Player {
+	if srcAttack, ok := ctx.src.(entity.AttackDamageSource); !ok {
+		if ent, ok := srcAttack.Attacker.(*player.Player); ok {
+			return ent
+		}
+
+		return nil
+	} else if srcProj, ok := ctx.src.(entity.ProjectileDamageSource); ok {
+		if ent, ok := srcProj.Owner.(*player.Player); ok {
+			return ent
+		}
+	}
+
+	return nil
 }
 
 // Source returns the source of the damage that is dealt to the player.
-func (h *HurtContext) Source() world.DamageSource {
-	return h.src
+func (ctx *HurtContext) Source() world.DamageSource {
+	return ctx.src
 }
