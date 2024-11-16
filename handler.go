@@ -31,6 +31,11 @@ type Handler struct {
 	player.NopHandler
 }
 
+// Apply applies the handler to a player. This should be called to apply the handler to a player.
+func Apply(p *player.Player) {
+	p.Handle(&Handler{p: p})
+}
+
 // HandleBlockBreak handles a block that is being broken by a player. ctx.Cancel() may be called to cancel
 // the block being broken. A pointer to a slice of the block's drops is passed, and may be altered
 // to change what items will actually be dropped.
