@@ -10,6 +10,11 @@ type HealContext struct {
 	CancellableContext
 }
 
+// NewHealContext creates a new HealContext with the amount of health that will be healed and the source of the healing.
+func NewHealContext(amount float64, src world.HealingSource) *HealContext {
+	return &HealContext{amount: amount, src: src}
+}
+
 // Amount returns the amount of health that will be healed.
 func (ctx *HealContext) Amount() float64 {
 	return ctx.amount

@@ -13,6 +13,17 @@ type AttackEntityContext struct {
 	CancellableContext
 }
 
+func NewAttackEntityContext(e world.Entity, force, height float64, critical bool) *AttackEntityContext {
+	return &AttackEntityContext{
+		e: e,
+
+		force:  force,
+		height: height,
+
+		critical: critical,
+	}
+}
+
 // Entity returns the entity that is being attacked.
 func (ctx *AttackEntityContext) Entity() world.Entity {
 	return ctx.e
@@ -46,15 +57,4 @@ func (ctx *AttackEntityContext) Critical() bool {
 // SetCritical sets whether the attack is critical.
 func (ctx *AttackEntityContext) SetCritical(critical bool) {
 	ctx.critical = critical
-}
-
-func NewAttackEntityContext(e world.Entity, force, height float64, critical bool) *AttackEntityContext {
-	return &AttackEntityContext{
-		e: e,
-
-		force:  force,
-		height: height,
-
-		critical: critical,
-	}
 }

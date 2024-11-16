@@ -20,6 +20,15 @@ type HurtContext struct {
 	CancellableContext
 }
 
+// NewHurtContext creates a new HurtContext with the damage, attack immunity and source passed.
+func NewHurtContext(damage float64, attackImmunity time.Duration, src world.DamageSource) *HurtContext {
+	return &HurtContext{
+		damage:         damage,
+		attackImmunity: attackImmunity,
+		src:            src,
+	}
+}
+
 // Damage returns the amount of damage that is dealt to the player.
 func (h *HurtContext) Damage() float64 {
 	return h.damage

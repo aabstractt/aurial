@@ -11,6 +11,15 @@ type MoveContext struct {
 	CancellableContext
 }
 
+func NewMoveContext(to mgl64.Vec3, yaw, pitch float64) *MoveContext {
+	return &MoveContext{
+		to: to,
+
+		yaw:   yaw,
+		pitch: pitch,
+	}
+}
+
 // To returns the position to which the player is moving.
 func (ctx *MoveContext) To() mgl64.Vec3 {
 	return ctx.to

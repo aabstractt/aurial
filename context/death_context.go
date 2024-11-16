@@ -12,6 +12,11 @@ type DeathContext struct {
 	messageCondition func(p *player.Player) bool
 }
 
+// NewDeathContext creates a new DeathContext with the source of the damage that killed the player.
+func NewDeathContext(src world.DamageSource, keepInv bool) *DeathContext {
+	return &DeathContext{src: src, keepInv: keepInv}
+}
+
 // Source returns the source of the damage that killed the player.
 func (ctx *DeathContext) Source() world.DamageSource {
 	return ctx.src

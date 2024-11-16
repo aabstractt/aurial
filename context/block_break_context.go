@@ -14,6 +14,16 @@ type BlockBreakContext struct {
 	CancellableContext
 }
 
+// NewBlockBreakContext creates a new BlockBreakContext with the position of the block that is being broken.
+func NewBlockBreakContext(pos cube.Pos, drops []item.Stack, xp int) *BlockBreakContext {
+	return &BlockBreakContext{
+		pos: pos,
+
+		drops: drops,
+		xp:    xp,
+	}
+}
+
 // Pos returns the position of the block that is being broken.
 func (ctx *BlockBreakContext) Pos() cube.Pos {
 	return ctx.pos

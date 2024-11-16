@@ -12,6 +12,14 @@ type BlockPlaceContext struct {
 	CancellableContext
 }
 
+// NewBlockPlaceContext creates a new BlockPlaceContext with the given position and block.
+func NewBlockPlaceContext(pos cube.Pos, b world.Block) *BlockPlaceContext {
+	return &BlockPlaceContext{
+		pos: pos,
+		b:   b,
+	}
+}
+
 // Pos returns the position at which the block is being placed.
 func (ctx *BlockPlaceContext) Pos() cube.Pos {
 	return ctx.pos
