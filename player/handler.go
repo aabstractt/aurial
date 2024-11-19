@@ -23,6 +23,10 @@ type Handler struct {
 // Apply applies the handler to a player. This should be called to apply the handler to a player.
 func Apply(srv *server.Server, p *player.Player) {
 	p.Handle(&Handler{srv: srv, p: p})
+
+	for _, h := range joinRegistry.All() {
+		h.HandleJoin(p)
+	}
 }
 
 // HandleBlockBreak handles a block that is being broken by a player. ctx.Cancel() may be called to cancel
