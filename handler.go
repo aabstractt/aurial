@@ -14,16 +14,17 @@ import (
 )
 
 var (
+	attackEntityRegistry = newRegistry[AttackEntityHandler]()
+	changeWorldRegistry  = newRegistry[ChangeWorldHandler]()
 	blockBreakRegistry   = newRegistry[BlockBreakHandler]()
 	blockPlaceRegistry   = newRegistry[BlockPlaceHandler]()
-	attackEntityRegistry = newRegistry[AttackEntityHandler]()
-	hurtRegistry         = newRegistry[HurtHandler]()
-	deathRegistry        = newRegistry[DeathHandler]()
 	foodLossRegistry     = newRegistry[FoodLossHandler]()
+	teleportRegistry     = newRegistry[TeleportHandler]()
+	itemUseRegistry      = newRegistry[ItemUseHandler]()
+	deathRegistry        = newRegistry[DeathHandler]()
+	hurtRegistry         = newRegistry[HurtHandler]()
 	healRegistry         = newRegistry[HealHandler]()
 	chatRegistry         = newRegistry[ChatHandler]()
-	changeWorldRegistry  = newRegistry[ChangeWorldHandler]()
-	teleportRegistry     = newRegistry[TeleportHandler]()
 	moveRegistry         = newRegistry[MoveHandler]()
 	quitRegistry         = newRegistry[QuitHandler]()
 )
@@ -229,5 +230,18 @@ func (h *Handler) HandleMove(ectx *event.Context, newPos mgl64.Vec3, newYaw, new
 func (h *Handler) HandleQuit() {
 	for _, handler := range quitRegistry.all() {
 		handler.HandleQuit(h.p)
+	}
+}
+
+// HandleItemUse handles the player using an item. ctx.Cancel() may be called to cancel the item use.
+func (h *Handler) HandleItemUse(ectx *event.Context) {
+	ctx := context.NewItemUseContext(h.p.HeldItems())
+
+	for _, handler := range itemUseRegistry.all() {
+		handler.HandleItemUse(h.p, ctx)
+	}
+
+	if ctx.Cancelled() {
+		ectx.Cancel()
 	}
 }

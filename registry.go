@@ -97,3 +97,7 @@ func MoveRegistry() *Registry[MoveHandler] {
 func QuitRegistry() *Registry[QuitHandler] {
 	return quitRegistry
 }
+
+func ItemUseRegistry() *Registry[ItemUseHandler] {
+	return itemUseRegistry
+}
