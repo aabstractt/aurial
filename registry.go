@@ -31,7 +31,7 @@ func (r *Registry[V]) Remove(index int32) {
 	r.mu.Unlock()
 }
 
-func (r *Registry[V]) all() []V {
+func (r *Registry[V]) All() []V {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -43,61 +43,9 @@ func (r *Registry[V]) all() []V {
 	return values
 }
 
-func newRegistry[V any]() *Registry[V] {
+func NewRegistry[V any]() *Registry[V] {
 	return &Registry[V]{
 		values: make(map[int32]V),
 		number: new(atomic.Int32),
 	}
-}
-
-func BlockBreakRegistry() *Registry[BlockBreakHandler] {
-	return blockBreakRegistry
-}
-
-func BlockPlaceRegistry() *Registry[BlockPlaceHandler] {
-	return blockPlaceRegistry
-}
-
-func AttackEntityRegistry() *Registry[AttackEntityHandler] {
-	return attackEntityRegistry
-}
-
-func HurtRegistry() *Registry[HurtHandler] {
-	return hurtRegistry
-}
-
-func DeathRegistry() *Registry[DeathHandler] {
-	return deathRegistry
-}
-
-func FoodLossRegistry() *Registry[FoodLossHandler] {
-	return foodLossRegistry
-}
-
-func HealRegistry() *Registry[HealHandler] {
-	return healRegistry
-}
-
-func ChatRegistry() *Registry[ChatHandler] {
-	return chatRegistry
-}
-
-func ChangeWorldRegistry() *Registry[ChangeWorldHandler] {
-	return changeWorldRegistry
-}
-
-func TeleportRegistry() *Registry[TeleportHandler] {
-	return teleportRegistry
-}
-
-func MoveRegistry() *Registry[MoveHandler] {
-	return moveRegistry
-}
-
-func QuitRegistry() *Registry[QuitHandler] {
-	return quitRegistry
-}
-
-func ItemUseRegistry() *Registry[ItemUseHandler] {
-	return itemUseRegistry
 }
