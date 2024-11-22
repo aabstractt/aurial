@@ -233,3 +233,9 @@ func (h *Handler) HandleItemUse(ectx *event.Context) {
 		ectx.Cancel()
 	}
 }
+
+func (h *Handler) HandlePunchAir(_ *event.Context) {
+	for _, handler := range punchAirRegistry.All() {
+		handler.HandlePunchAir(h.p)
+	}
+}
