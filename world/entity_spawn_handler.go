@@ -10,7 +10,7 @@ var entitySpawnRegistry = aurial.NewRegistry[EntitySpawnHandler]()
 
 type EntitySpawnHandler interface {
 	// HandleEntitySpawn handles the spawning of an entity in the world.
-	HandleEntitySpawn(w *world.World, ctx *context.EntitySpawnContext)
+	HandleEntitySpawn(tx *world.Tx, ctx *context.EntitySpawnContext)
 }
 
 func EntitySpawnRegistry() *aurial.Registry[EntitySpawnHandler] {

@@ -1,22 +1,21 @@
 package context
 
-import "github.com/go-gl/mathgl/mgl64"
+import (
+	"github.com/df-mc/dragonfly/server/block/cube"
+	"github.com/go-gl/mathgl/mgl64"
+)
 
 type MoveContext struct {
-	to mgl64.Vec3
-
-	yaw   float64
-	pitch float64
+	to  mgl64.Vec3
+	rot cube.Rotation
 
 	CancellableContext
 }
 
-func NewMoveContext(to mgl64.Vec3, yaw, pitch float64) *MoveContext {
+func NewMoveContext(to mgl64.Vec3, rot cube.Rotation) *MoveContext {
 	return &MoveContext{
-		to: to,
-
-		yaw:   yaw,
-		pitch: pitch,
+		to:  to,
+		rot: rot,
 	}
 }
 
@@ -30,22 +29,12 @@ func (ctx *MoveContext) SetTo(to mgl64.Vec3) {
 	ctx.to = to
 }
 
-// Yaw returns the yaw to which the player is moving.
-func (ctx *MoveContext) Yaw() float64 {
-	return ctx.yaw
+// Rotation returns the rotation to which the player is moving.
+func (ctx *MoveContext) Rotation() cube.Rotation {
+	return ctx.rot
 }
 
-// SetYaw sets the yaw to which the player is moving.
-func (ctx *MoveContext) SetYaw(yaw float64) {
-	ctx.yaw = yaw
-}
-
-// Pitch returns the pitch to which the player is moving.
-func (ctx *MoveContext) Pitch() float64 {
-	return ctx.pitch
-}
-
-// SetPitch sets the pitch to which the player is moving.
-func (ctx *MoveContext) SetPitch(pitch float64) {
-	ctx.pitch = pitch
+// SetRotation sets the rotation to which the player is moving.
+func (ctx *MoveContext) SetRotation(rot cube.Rotation) {
+	ctx.rot = rot
 }

@@ -7,18 +7,16 @@ import (
 
 type handler struct {
 	world.NopHandler
-
-	w *world.World
 }
 
 func Apply(w *world.World) {
-	w.Handle(&handler{w: w})
+	w.Handle(&handler{})
 }
 
-func (h *handler) HandleEntitySpawn(e world.Entity) {
+func (h *handler) HandleEntitySpawn(tx *world.Tx, e world.Entity) {
 	ctx := context.NewEntitySpawnContext(e)
 
 	for _, hand := range entitySpawnRegistry.All() {
-		hand.HandleEntitySpawn(h.w, ctx)
+		hand.HandleEntitySpawn(tx, ctx)
 	}
 }
