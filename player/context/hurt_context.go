@@ -12,6 +12,10 @@ type HurtContext struct {
 	// amount of damage dealt to the player.
 	damage float64
 
+	// Immune is whether the player is immune to the damage that is dealt to them. If the player is immune, the
+	// damage will not be dealt to the player.
+	immune bool
+
 	// AttackImmunity is the duration for which the player is immune to attacks. This value may be changed to
 	// change the duration of immunity.
 	attackImmunity time.Duration
@@ -23,9 +27,10 @@ type HurtContext struct {
 }
 
 // NewHurtContext creates a new HurtContext with the damage, attack immunity and source passed.
-func NewHurtContext(damage float64, attackImmunity time.Duration, src world.DamageSource) *HurtContext {
+func NewHurtContext(damage float64, immune bool, attackImmunity time.Duration, src world.DamageSource) *HurtContext {
 	return &HurtContext{
 		damage:         damage,
+		immune:         immune,
 		attackImmunity: attackImmunity,
 		src:            src,
 	}
@@ -39,6 +44,11 @@ func (ctx *HurtContext) Damage() float64 {
 // SetDamage sets the amount of damage that is dealt to the player.
 func (ctx *HurtContext) SetDamage(damage float64) {
 	ctx.damage = damage
+}
+
+// Immune returns whether the player is immune to the damage that is dealt to them.
+func (ctx *HurtContext) Immune() bool {
+	return ctx.immune
 }
 
 // AttackImmunity returns the duration for which the player is immune to attacks.

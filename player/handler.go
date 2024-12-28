@@ -77,8 +77,8 @@ func (h *Handler) HandleAttackEntity(ectx *player.Context, e world.Entity, force
 
 // HandleHurt handles the player being hurt by a damage source. ctx.Cancel() may be called to cancel the
 // damage being dealt to the player. The damage dealt to the player may be changed by assigning to *damage.
-func (h *Handler) HandleHurt(ectx *player.Context, damage *float64, _ bool, attackImmunity *time.Duration, src world.DamageSource) {
-	ctx := context.NewHurtContext(*damage, *attackImmunity, src)
+func (h *Handler) HandleHurt(ectx *player.Context, damage *float64, immune bool, attackImmunity *time.Duration, src world.DamageSource) {
+	ctx := context.NewHurtContext(*damage, immune, *attackImmunity, src)
 
 	for _, handler := range hurtRegistry.All() {
 		handler.HandleHurt(ectx.Val(), ctx)
